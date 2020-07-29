@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Trodo</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+		<link rel="stylesheet" href="https://unpkg.com/bulma@0.8.0/css/bulma.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/admin.css">
+	</head>
+	<body>
+		<div id="app">
+			<!-- START TITLE -->
+			<section class="hero is-info is-bold">
+				<div class="hero-body">
+					<div class="container has-text-centered">
+						<h1 class="title">
+						BTTS
+						</h1>
+						<h2 class="subtitle">
+						teste de indicação das forças de defesa e ataque
+						</h2>
+					</div>
+				</div>
+			</section>
+			<!-- END TITLE -->
+
+			<!-- START NAV -->
+			<nav class="navbar is-white">
+				<div class="container">
+					<div class="navbar-brand">
+						<p class="navbar-item brand-text">
+							BTTS
+						</p>
+						<div class="navbar-burger burger" data-target="navMenu">
+							<span></span>
+							<span></span>
+							<span></span>
+						</div>
+					</div>
+					<div id="navMenu" class="navbar-menu">
+						<div class="navbar-start">
+							<a class="navbar-item is-tab is-active" href="index.html">
+								Fazer previsão
+							</a>
+							<a class="navbar-item is-tab" href="campeonato.html">
+								Visualizar campeonato
+							</a>
+						</div>
+					</div>
+				</div>
+			</nav>
+			<!-- END NAV -->
+
+			<div class="container">
+				<div class="columns">
+					<div class="column is-6">
+						<div class="card events-card">
+							<header class="card-header">
+								<p class="card-header-title">
+									Selecione os 2 times na lista abaixo
+								</p>
+							</header>
+							<div class="card-table">
+								<div class="content">
+									<table class="table is-fullwidth is-striped">
+										<tbody>
+											<tr v-for="time in times">
+												<td>{{time.nome}} ({{time.atk}}/{{time.def}})</td>
+												<td class="level-right">
+													<a
+														@click="selecionarHome(time)"
+														class="button is-small is-info"
+														:class="timeHome && time.nome!=timeHome.nome?'is-light':''"
+														>
+														Home
+													</a>
+													<a
+														@click="selecionarAway(time)"
+														class="button is-small is-primary"
+														:class="timeAway && time.nome!=timeAway.nome?'is-light':''"
+														>
+														Away
+													</a>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="column is-6" v-if="timeHome !== null && timeAway !== null">
+						<div class="info-tiles">
+	                        <div class="tile is-ancestor has-text-centered">
+	                            <div class="tile is-parent">
+	                                <article class="tile is-child box">
+	                                    <p class="title"> 
+	                                    	<i
+	                                    		:class="ambasMarcam()?
+	                                    		'has-text-success fa fa-check':
+	                                    		'has-text-danger fa fa-close'"
+	                                    		aria-hidden="true"></i>
+	                                    	ambas marcam
+	                                    </p>
+	                                </article>
+	                            </div>
+	                            <div class="tile is-parent">
+	                                <article class="tile is-child box">
+	                                    <p class="title">{{golsHome()}} - {{golsAway()}}</p>
+	                                    <p class="subtitle">{{timeHome.nome}} vs {{timeAway.nome}}</p>
+	                                </article>
+	                            </div>
+	                        </div>
+	                    </div>
+						<div class="card events-card">
+							<header class="card-header">
+								<p class="card-header-title">
+									Detalhes
+								</p>
+							</header>
+							<div class="card-table">
+								<div class="content">
+									<table class="table is-fullwidth">
+										<tbody>
+											<tr>
+												<td></td>
+												<td>
+													<a class="button is-small is-light" href="#">
+														atk
+													</a>
+												</td>
+												<td>
+													<a class="button is-small is-light" href="#">
+														def
+													</a>
+												</td>
+											</tr>
+											<tr>
+												<td>{{timeHome.nome}}</td>
+												<td><a class="button is-small" href="#">{{timeHome.atk}}</a></td>
+												<td><a class="button is-small" href="#">{{timeHome.def}}</a></td>
+											</tr>
+											<tr>
+												<td>{{timeAway.nome}}</td>
+												<td><a class="button is-small" href="#">{{timeAway.atk}}</a></td>
+												<td><a class="button is-small" href="#">{{timeAway.def}}</a></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<footer class="card-footer">
+							    <a href="#" class="card-footer-item">
+							    	{{golsHome(true)}} x
+							    	{{golsAway(true)}}
+								</a>
+							</footer>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="js/dashboard.js"></script>
+	</body>
+</html>

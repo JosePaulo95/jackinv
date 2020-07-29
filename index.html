@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Jackinv</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+		<link rel="stylesheet" href="https://unpkg.com/bulma@0.8.0/css/bulma.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/inbox.css">
+		<link rel="stylesheet" type="text/css" href="css/planos.css">
+		<link rel="stylesheet" type="text/css" href="css/slider-w3.css">
+	</head>
+	<body>
+		<div id="app">
+			<!-- START TITLE -->
+			<nav class="navbar has-shadow">
+		        <div class="container">
+		            <div class="navbar-brand">
+		                <a class="navbar-item" href="../">
+		                    <img src="http://bulma.io/images/bulma-logo.png">
+		                </a>
+		            </div>
+		        </div>
+		    </nav>
+			<!-- END TITLE -->
+
+			<div class="container">
+				<div class="columns">
+					<div class="column is-8 messages" id="message-feed">
+				        <canvas id="myChart"></canvas>
+				        <div class="menu-intervalos tip-group">
+							<a
+								class="button is-primary"
+								v-for="(opt_intervalo, index) in opts_intervalo"
+								:class="{'is-outlined': !opt_intervalo.is_selected}"
+								v-on:click="selecionaIntervalo(index)"	
+							>
+					            {{opt_intervalo.label}}
+		    			    </a>
+						</div>
+				        <!--
+					        <div class="slidecontainer">
+							  <input type="range" v-model="eixo_x.range_selecionado" min="1" max="100" class="slider" id="myRange" @change="atualizarChart()">
+							</div>
+							<p>{{eixo_x.range_selecionado}}</p>
+							<p>{{GetQtdeSteps}}</p>
+						-->
+					</div>
+					<div class="column is-4 messages" id="message-feed">
+	                    <a
+	                    	class="button has-text-centered is-primary is-block is-bold"
+	                    	v-on:click="ligaDesligaCreationMenu()"
+	                    >
+	                    	<i class="fa fa-plus"></i>
+				            Criar plano
+	    			    </a>
+		                
+			            <div class="inbox-messages" id="inbox-messages">
+			            	<div v-if="isCreationMenuVisible" class="card formulario-plano" >
+			                    <div class="card-content">
+			                        <div class="msg-header">
+			                            <span class="msg-from"><strong>Novo plano</strong></span>
+			                        </div>
+			                        <form id="menu-creation" onsubmit="return false">
+										<div class="field has-addons">
+											<p class="control">
+											<a class="button is-static">
+												R$
+											</a>
+											</p>
+											<p class="control is-expanded">
+												<input required class="input" v-model="creationMenuValorInicial" type="number" min="0.01" step="0.01" placeholder="Valor inicial">
+											</p>
+										</div>
+										<div class="tip-group">
+											<a
+												class="button is-light"
+												v-for="tipValorInicial in tipsValoresIniciais"
+												v-on:click="creationMenuValorInicialTip(tipValorInicial)"
+											>
+												R$ {{tipValorInicial}}
+											</a>
+										</div>
+
+										<div class="field has-addons">
+										  <p class="control">
+										    <input required class="input" v-model="creationMenuValorRendimento" type="number" min="0.01" step="0.01" placeholder="Rendimento">
+										  </p>
+										  <p class="control">
+										    <span class="select">
+										      <select v-model="creationMenuTipoRendimentoSelecionado">
+										        <option
+										        	v-for="(tipoRendimento, index) in tabelaTiposRendimento"
+										        	v-bind:value="{...tipoRendimento}"
+										        >
+										        	{{tipoRendimento.label}}
+										        </option>
+										      </select>
+										    </span>
+										  </p>
+										</div>
+										<div class="tip-group">
+											<a
+												class="button is-light"
+												v-for="tipRendimento in tipsRendimentos"
+												v-on:click="creationMenuRendimentoTip(tipRendimento)"
+											>
+												{{tipRendimento}}%
+											</a>
+									  	</div>
+										<div class="field has-addons has-addons-right">
+										  <p class="control is-expanded">
+										    <input required class="input" v-model="creationMenuValorTitulo" type="text" placeholder="Nome">
+										  </p>
+										  <p class="control">
+										    <a class="button is-light" v-on:click="creationMenuGerarNome()" :disabled="!creationMenuCamposNumericosEstaoPreenchidos()">
+										      sugerir nome
+										    </a>
+										  </p>
+										</div>
+										<div class="field is-grouped">
+										  <p class="control">
+										    <button class="button is-primary" @click="criarPlano()">
+										     	Criar
+										    </button>
+										  </p>
+										  <p class="control">
+										    <button class="button is-light" @click="ligaDesligaCreationMenu()">
+										      Cancelar
+										    </button>
+										  </p>
+										</div>
+									</form>
+			                    </div>
+			                </div>
+			                <div
+			                	v-for="(plano, index) in planos.slice().reverse()"
+			                	class="card"
+			                	:class="{active: plano.hover}"
+			                	v-bind:style="{ 'background-color': getCorPlano(planos.length-1-index, 0.2)}"
+			                	@mouseover="plano.hover = true"
+      							@mouseleave="plano.hover = false"
+			                >
+			                    <div class="card-content">
+			                        <div class="msg-header">
+			                            <span class="titulo-largura-limitada"><strong>{{plano.nome}}</strong></span>
+			                            <span
+			                            	class="msg-attachment"
+			                            	:class="{'is-small button': plano.hover}"
+			                            	v-on:click="ligaDesligaPlanoVisivel(planos.length-1-index)"
+			                            >
+			                            	<i :class="{
+			                            		'fa fa-eye': visibilidade_planos[planos.length-1-index],
+			                            		'fa fa-eye-slash': !visibilidade_planos[planos.length-1-index],
+			                            	}"></i>
+			                            </span>
+			                            <span
+			                            	class="msg-attachment is-small button"
+			                            	v-if="plano.hover"
+			                            >
+			                            	<i class="fa fa-pencil"></i>
+			                            </span>
+			                            <span
+			                            	class="msg-attachment is-small button"
+			                            	v-on:click="deletarPlano(plano)"
+			                            	v-if="plano.hover"
+			                            >
+			                            	<i class="fa fa-trash"></i>
+			                            </span>
+			                        </div>
+
+			                        <div class="msg-snippet">
+			                        	<div v-if="!plano.is_editing">
+				                        	<p class="info-sutil">R$ {{currency(plano.valor_inicial)}} iniciais</p>
+				                            <p class="info-sutil">{{planoRendimentoComoSentenca(plano)}}</p>
+				                        </div>
+				                        <div v-if="plano.is_editing">
+				                        	
+				                        </div>
+			                        </div>
+			                    </div>
+			                </div>
+			                <!-- header qdo hover
+			                <div class="card">
+			                    <div class="card-content">
+			                        <div class="msg-header">
+			                            <span class="msg-from"><strong>Editando <span class="tag is-medium">5% ao mês</span></strong></span>
+			                        </div>
+			                        <div class="field has-addons has-addons-right">
+									  <p class="control is-expanded">
+									    <input class="input" type="text" placeholder="nome">
+									  </p>
+									  <p class="control">
+									    <a class="button is-primary">
+									      gerar nome
+									    </a>
+									  </p>
+									</div>
+			                        <div class="field is-horizontal">
+									  <div class="field-body">
+									    <div class="field">
+									      <div class="field has-addons">
+									        <p class="control">
+									          <a class="button is-static">
+									            R$
+									          </a>
+									        </p>
+									        <p class="control is-expanded">
+									          <input class="input" type="tel" placeholder="Valor inicial">
+									        </p>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									<div class="field has-addons">
+									  <p class="control">
+									    <input class="input" type="text" placeholder="Rendimento">
+									  </p>
+									  <p class="control">
+									    <span class="select">
+									      <select>
+									        <option>% a.d.</option>
+									        <option>% a.m.</option>
+									        <option>% a.a.</option>
+									        <option>% a.d. (excluindo fds)</option>
+									        <option>% a.m. (excluindo fds)</option>
+									      </select>
+									    </span>
+									  </p>
+									</div>
+									<div class="field is-grouped">
+									  <p class="control">
+									    <a class="button is-primary">
+									      Salvar
+									    </a>
+									  </p>
+									  <p class="control">
+									    <a class="button is-light">
+									      Cancelar
+									    </a>
+									  </p>
+									</div>
+			                    </div>
+			                </div>
+			            	-->
+			            </div>
+			        </div>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/locale/pt-br.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script src="js/currency.min.js"></script>
+		<script src="js/planos.js"></script>
+	</body>
+</html>

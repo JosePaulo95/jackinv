@@ -1,0 +1,23 @@
+.formulario-plano .card-content .control{
+	margin-top: 1em;
+}
+.tip-group a{
+	margin: -5px 3px 0 0;
+}
+.menu-intervalos{
+	display: flex;
+	justify-content: space-around;
+	background-color: #fff;
+	border-top: 1px solid #DEDEDE;
+	padding: 20px 20px;
+	margin-top: 30px;
+
+}
+.menu-intervalos .button{
+	width: 22%;
+}
+.titulo-largura-limitada{
+	display:block;
+    width:150px;
+    word-wrap:break-word;
+}
